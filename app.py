@@ -130,8 +130,9 @@ header[data-testid="stHeader"] {{ background: transparent; }}
 try:
     with open("data.json", "r", encoding="utf-8") as f:
         data = json.load(f)
-except Exception:
+except Exception as e:
     data = []
+    st.warning(f"data.json ما تقراش: {e}")
 
 FALLBACK = "سمح ليا، ما فهمتش سؤالك مزيان. عاود صيغو بطريقة أخرى."
 
@@ -145,13 +146,38 @@ SUGGESTIONS = [
 ]
 
 
+def normalize(text: str) -> str:
+    """Unify Arabic spelling variants so 'أتاي' and 'اتاي' match."""
+    text = text.lower().strip()
+    for ch in "؟?!.,،:;":
+        text = text.replace(ch, " ")
+    for a in "أإآٱ":
+        text = text.replace(a, "ا")
+    text = text.replace("ى", "ي").replace("ة", "ه").replace("ـ", "")
+    text = "".join(c for c in text if not ("\u064B" <= c <= "\u0652"))  # diacritics
+    return " ".join(text.split())
+
+
 def get_answer(question: str) -> str:
-    q = question.lower().strip().rstrip("؟?!.")
+    q = normalize(question)
+    q_words = set(q.split())
+    best, best_score = None, 0.0
     for item in data:
         for p in item.get("patterns", []):
-            p = p.lower()
+            p = normalize(p)
+            if not p:
+                continue
             if p in q or q in p:
-                return random.choice(item.get("responses", [FALLBACK]))
+                score = 1.0 + len(p) / 100  # longer match wins
+            else:
+                p_words = set(p.split())
+                score = len(p_words & q_words) / max(len(p_words), 1)
+                if score < 0.6:
+                    continue
+            if score > best_score:
+                best, best_score = item, score
+    if best:
+        return random.choice(best.get("responses", [FALLBACK]))
     return FALLBACK
 
 
