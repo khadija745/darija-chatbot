@@ -1,116 +1,122 @@
+import base64
 import json
 import random
  
 import streamlit as st
  
-st.set_page_config(page_title="Khadija · Darija Bot", page_icon="🫖", layout="centered")
+st.set_page_config(page_title="Khadija · Darija Bot", page_icon="🕌", layout="centered")
  
-# ---------- Design: Majorelle blue + saffron, inspired by Marrakech ----------
-st.markdown("""
+RED = "#C1272D"
+GREEN = "#006233"
+ 
+# ---------- Logo: red disc with the green Moroccan star (pentagram) ----------
+LOGO_SVG = f"""
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="47" fill="{RED}" stroke="#ffffff" stroke-width="4"/>
+  <polygon points="50,22 66.46,72.65 23.37,41.35 76.63,41.35 33.54,72.65"
+           fill="none" stroke="{GREEN}" stroke-width="4.5" stroke-linejoin="miter"/>
+</svg>
+"""
+LOGO_URI = "data:image/svg+xml;base64," + base64.b64encode(LOGO_SVG.encode()).decode()
+ 
+# ---------- Design ----------
+st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=Tajawal:wght@400;500;700&display=swap');
  
-:root {
-    --blue: #2B3A9E;      /* Majorelle blue */
-    --blue-deep: #17205E;
-    --saffron: #F2B632;
-    --paper: #F7F9FF;
-    --ink: #1B1F3B;
-}
- 
-html, body, .stApp, [data-testid="stAppViewContainer"] {
+html, body, .stApp, [data-testid="stAppViewContainer"] {{
     font-family: 'Tajawal', sans-serif;
     direction: rtl;
-    color: var(--ink);
-}
+}}
  
-/* Background: soft blue with a faint zellige-like diamond grid */
-.stApp {
-    background-color: var(--paper);
+.stApp {{
+    background-color: #FFFDF8;
     background-image:
-        linear-gradient(45deg, rgba(43,58,158,.05) 25%, transparent 25%, transparent 75%, rgba(43,58,158,.05) 75%),
-        linear-gradient(45deg, rgba(43,58,158,.05) 25%, transparent 25%, transparent 75%, rgba(43,58,158,.05) 75%);
+        linear-gradient(45deg, rgba(0,98,51,.05) 25%, transparent 25%, transparent 75%, rgba(0,98,51,.05) 75%),
+        linear-gradient(45deg, rgba(0,98,51,.05) 25%, transparent 25%, transparent 75%, rgba(0,98,51,.05) 75%);
     background-size: 44px 44px;
     background-position: 0 0, 22px 22px;
-}
+}}
+header[data-testid="stHeader"] {{ background: transparent; }}
+#MainMenu, footer {{ visibility: hidden; }}
  
-header[data-testid="stHeader"] { background: transparent; }
-#MainMenu, footer { visibility: hidden; }
- 
-/* Hero banner shaped like a Moroccan arch */
-.hero {
-    background: var(--blue);
+/* Header: red band, green base */
+.hero {{
+    background: {RED};
     color: #fff;
     text-align: center;
-    padding: 2.2rem 1.5rem 1.6rem;
-    margin: 0 auto 1.8rem;
-    max-width: 420px;
-    border-radius: 200px 200px 18px 18px;
-    border-bottom: 6px solid var(--saffron);
-    box-shadow: 0 14px 30px rgba(23,32,94,.25);
-}
-.hero h1 {
+    padding: 1.6rem 1rem 1.3rem;
+    margin-bottom: 1.6rem;
+    border-radius: 22px;
+    border-bottom: 8px solid {GREEN};
+    box-shadow: 0 12px 26px rgba(193,39,45,.25);
+}}
+.hero img {{ width: 92px; height: 92px; filter: drop-shadow(0 4px 6px rgba(0,0,0,.25)); }}
+.hero h1 {{
     font-family: 'Reem Kufi', sans-serif;
     font-size: 2.1rem;
-    margin: .4rem 0 .2rem;
+    margin: .3rem 0 .1rem;
     color: #fff;
-}
-.hero p { margin: 0; color: #D9DEFF; font-size: 1rem; }
-.hero .lamp { font-size: 2rem; }
+}}
+.hero p {{ margin: 0; font-size: 1.05rem; color: #FFE9E9; }}
  
 /* Chat bubbles */
-[data-testid="stChatMessage"] {
+[data-testid="stChatMessage"] {{
     border-radius: 18px;
     padding: .9rem 1.1rem;
     margin-bottom: .7rem;
-    border: 1px solid rgba(43,58,158,.15);
-    box-shadow: 0 4px 12px rgba(23,32,94,.06);
-}
-/* user = saffron */
-[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
-    background: #FFF4D6;
-    border-right: 6px solid var(--saffron);
-}
-/* bot = blue */
-[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) {
+    box-shadow: 0 4px 12px rgba(0,0,0,.05);
+}}
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {{
+    background: #FDECEC;
+    border-right: 6px solid {RED};
+}}
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) {{
+    background: #E6F4EC;
+    border-right: 6px solid {GREEN};
+}}
+[data-testid="stChatMessage"] p {{ font-size: 1.05rem; line-height: 1.8; }}
+ 
+/* Suggested-question buttons */
+.stButton > button {{
+    font-family: 'Tajawal', sans-serif;
     background: #fff;
-    border-right: 6px solid var(--blue);
-}
-[data-testid="stChatMessage"] p { font-size: 1.05rem; line-height: 1.8; }
+    color: {GREEN};
+    border: 2px solid {GREEN};
+    border-radius: 999px;
+    font-weight: 500;
+}}
+.stButton > button:hover {{
+    background: {GREEN};
+    color: #fff;
+    border-color: {GREEN};
+}}
+.stButton > button:focus-visible {{ outline: 3px solid {RED}; }}
  
 /* Input */
-[data-testid="stChatInput"] {
-    border: 2px solid var(--blue);
+[data-testid="stChatInput"] {{
+    border: 2px solid {GREEN};
     border-radius: 999px;
     background: #fff;
-}
-[data-testid="stChatInput"]:focus-within {
-    border-color: var(--saffron);
-    box-shadow: 0 0 0 3px rgba(242,182,50,.35);
-}
-[data-testid="stChatInput"] textarea { direction: rtl; font-family: 'Tajawal', sans-serif; }
+}}
+[data-testid="stChatInput"]:focus-within {{
+    border-color: {RED};
+    box-shadow: 0 0 0 3px rgba(193,39,45,.25);
+}}
+[data-testid="stChatInput"] textarea {{ direction: rtl; font-family: 'Tajawal', sans-serif; }}
  
 /* Sidebar */
-[data-testid="stSidebar"] { background: var(--blue-deep); direction: rtl; }
-[data-testid="stSidebar"] * { color: #fff; }
-[data-testid="stSidebar"] .stButton button {
-    background: var(--saffron);
-    color: var(--blue-deep);
-    border: none;
-    font-weight: 700;
-    border-radius: 999px;
-}
- 
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+[data-testid="stSidebar"] {{ background: {GREEN}; direction: rtl; }}
+[data-testid="stSidebar"] * {{ color: #fff; }}
+[data-testid="stSidebar"] .stButton > button {{
+    background: {RED}; color: #fff; border: 2px solid #fff;
+}}
 </style>
-""", unsafe_allow_html=True)
  
-# ---------- Header ----------
-st.markdown("""
 <div class="hero">
-    <div class="lamp">🪔</div>
-    <h1>خديجة</h1>
-    <p>مرحبا بيك! هضر معايا بالدارجة وسولني اللي بغيتي.</p>
+    <img src="{LOGO_URI}" alt="Morocco logo"/>
+    <h1>شات بوت خديجة</h1>
+    <p>مرحبا بيك! كنهضر غير بالدارجة المغربية، سولني اللي بغيتي.</p>
 </div>
 """, unsafe_allow_html=True)
  
@@ -123,9 +129,18 @@ except Exception:
  
 FALLBACK = "سمح ليا، ما فهمتش سؤالك مزيان. عاود صيغو بطريقة أخرى."
  
+SUGGESTIONS = [
+    "شنو هي عاصمة المغرب؟",
+    "كيفاش نوجد الطاجين؟",
+    "كيفاش نوجد أتاي بالنعناع؟",
+    "فين نسافر فالمغرب؟",
+    "شنو معنى علم المغرب؟",
+    "شنو هي العملة المغربية؟",
+]
+ 
  
 def get_answer(question: str) -> str:
-    q = question.lower().strip()
+    q = question.lower().strip().rstrip("؟?!.")
     for item in data:
         for p in item.get("patterns", []):
             p = p.lower()
@@ -134,31 +149,42 @@ def get_answer(question: str) -> str:
     return FALLBACK
  
  
-# ---------- Sidebar ----------
+# ---------- State ----------
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+if "pending" not in st.session_state:
+    st.session_state.pending = None
+ 
 with st.sidebar:
     st.markdown("### خديجة")
     st.caption("بوت كيجاوب بالدارجة المغربية")
-    if st.button("مسح المحادثة"):
+    if st.button("مسح المحادثة", use_container_width=True):
         st.session_state.messages = []
         st.rerun()
  
-# ---------- Chat ----------
-if "messages" not in st.session_state:
-    st.session_state.messages = []
- 
 AVATARS = {"user": "🧑", "assistant": "🫖"}
+ 
+# ---------- Handle input (typed or clicked suggestion) ----------
+prompt = st.chat_input("كتب سؤالك هنا بالدارجة...")
+if st.session_state.pending:
+    prompt = st.session_state.pending
+    st.session_state.pending = None
+ 
+if prompt:
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    st.session_state.messages.append({"role": "assistant", "content": get_answer(prompt)})
+ 
+# ---------- Render ----------
+if not st.session_state.messages:
+    st.markdown("**جرب واحد من هاد الأسئلة:**")
+    cols = st.columns(2)
+    for i, q in enumerate(SUGGESTIONS):
+        if cols[i % 2].button(q, key=f"s{i}", use_container_width=True):
+            st.session_state.pending = q
+            st.rerun()
  
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"], avatar=AVATARS[msg["role"]]):
         st.write(msg["content"])
  
-if prompt := st.chat_input("كتب سؤالك هنا بالدارجة..."):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user", avatar=AVATARS["user"]):
-        st.write(prompt)
- 
-    answer = get_answer(prompt)
-    st.session_state.messages.append({"role": "assistant", "content": answer})
-    with st.chat_message("assistant", avatar=AVATARS["assistant"]):
-        st.write(answer)
- 
+
