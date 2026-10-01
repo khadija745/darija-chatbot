@@ -8,3 +8,4 @@ Chatbot intelligent qui comprend et répond en Darija Marocaine.
 
 **Étudiante:** Khadija
 **Année:** 2025/2026
+**réalisé par khadija-chatbot qui comprend la darija Marocaine avec 20 intents**
