@@ -1,29 +1,5 @@
 import streamlit as st
 import json
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-
-with open('data.json', encoding='utf-8') as f:
-    data = json.load(f)
-
-questions = [item['q'] for item in data]
-answers = [item['a'] for item in data]
-
-vectorizer = TfidfVectorizer()
-X = vectorizer.fit_transform(questions)
-
-st.title("Chatbot Darija - Projet S5")
-st.write("سولني أي حاجة بالدارجة")
-
-user_q = st.text_input("كتب سؤالك هنا:")
-
-if user_q:
-    user_vec = vectorizer.transform([user_q])
-    sim = cosine_similarity(user_vec, X)
-    idx = sim.argmax()
-    st.success(answers[idx])
-import streamlit as st
-import json
 
 st.set_page_config(page_title="Chatbot Darija", page_icon="🇲🇦", layout="centered")
 
@@ -31,12 +7,12 @@ st.set_page_config(page_title="Chatbot Darija", page_icon="🇲🇦", layout="ce
 st.markdown("""
 <style>
    .stApp { background-color: #FFF8F0; }
-    h1 { color: #C1272D; text-align: center; }
-   .stChatMessage { border-radius: 15px; }
+    h1 { color: #C1272D; text-align: center; font-family: 'Arial'; }
+   .stChatMessage { border-radius: 15px; padding: 10px; }
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🇲🇦 شات بوت بالدارجة المغربية")
+st.title("🇲🇦 شات بوت خديجة بالدارجة")
 st.markdown("<p style='text-align:center'>سولني أي حاجة بالدارجة و نجاوبك!</p>", unsafe_allow_html=True)
 
 # قراءة البيانات
@@ -47,17 +23,14 @@ except:
     data = []
 
 def get_answer(question):
-    question = question.lower()
+    question = question.lower().strip()
     for item in data:
-        # كاين نوعين ديال data.json
-        q = item.get('q') or item.get('patterns',[''])[0] if isinstance(item.get('patterns'), list) else item.get('patterns','')
-        if isinstance(q, list): q = q[0]
-
-        if q.lower() in question or question in q.lower():
-            a = item.get('a') or item.get('responses',[''])[0] if isinstance(item.get('responses'), list) else item.get('responses','')
-            if isinstance(a, list): a = a[0]
-            return a
-    return "سمح ليا، ما فهمتش سؤالك، عاود صيغو بطريقة أخرى؟ 😅"
+        patterns = item.get("patterns", [])
+        for p in patterns:
+            if p.lower() in question or question in p.lower():
+                # كيرجع أول جواب
+                return item.get("responses", ["ما فهمتش"])[0]
+    return "سمح ليا، ما فهمتش سؤالك مزيان، عاود صيغو بطريقة أخرى؟ 😅"
 
 # تاريخ المحادثة
 if "messages" not in st.session_state:
@@ -76,3 +49,7 @@ if prompt := st.chat_input("كتب سؤالك هنا بالدارجة..."):
     st.session_state.messages.append({"role": "assistant", "content": answer})
     with st.chat_message("assistant"):
         st.write(answer)
+
+
+
+ 
