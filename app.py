@@ -1,14 +1,14 @@
 import base64
 import json
 import random
- 
+
 import streamlit as st
- 
+
 st.set_page_config(page_title="Khadija · Darija Bot", page_icon="🕌", layout="centered")
- 
+
 RED = "#C1272D"
 GREEN = "#006233"
- 
+
 # ---------- Logo: red disc with the green Moroccan star (pentagram) ----------
 LOGO_SVG = f"""
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -18,17 +18,17 @@ LOGO_SVG = f"""
 </svg>
 """
 LOGO_URI = "data:image/svg+xml;base64," + base64.b64encode(LOGO_SVG.encode()).decode()
- 
+
 # ---------- Design ----------
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=Tajawal:wght@400;500;700&display=swap');
- 
+
 html, body, .stApp, [data-testid="stAppViewContainer"] {{
     font-family: 'Tajawal', sans-serif;
     direction: rtl;
 }}
- 
+
 .stApp {{
     background-color: #FFFDF8;
     background-image:
@@ -39,7 +39,7 @@ html, body, .stApp, [data-testid="stAppViewContainer"] {{
 }}
 header[data-testid="stHeader"] {{ background: transparent; }}
 #MainMenu, footer {{ visibility: hidden; }}
- 
+
 /* Header: red band, green base */
 .hero {{
     background: {RED};
@@ -59,7 +59,7 @@ header[data-testid="stHeader"] {{ background: transparent; }}
     color: #fff;
 }}
 .hero p {{ margin: 0; font-size: 1.05rem; color: #FFE9E9; }}
- 
+
 /* Chat bubbles */
 [data-testid="stChatMessage"] {{
     border-radius: 18px;
@@ -68,15 +68,21 @@ header[data-testid="stHeader"] {{ background: transparent; }}
     box-shadow: 0 4px 12px rgba(0,0,0,.05);
 }}
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {{
-    background: #FDECEC;
+    background: #FDECEC !important;
     border-right: 6px solid {RED};
 }}
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) {{
-    background: #E6F4EC;
+    background: #E6F4EC !important;
     border-right: 6px solid {GREEN};
 }}
+[data-testid="stChatMessage"],
+[data-testid="stChatMessage"] p,
+[data-testid="stChatMessage"] div {{
+    color: #1B1F1D !important;
+}}
 [data-testid="stChatMessage"] p {{ font-size: 1.05rem; line-height: 1.8; }}
- 
+[data-testid="stMarkdownContainer"] strong {{ color: {GREEN}; }}
+
 /* Suggested-question buttons */
 .stButton > button {{
     font-family: 'Tajawal', sans-serif;
@@ -92,7 +98,7 @@ header[data-testid="stHeader"] {{ background: transparent; }}
     border-color: {GREEN};
 }}
 .stButton > button:focus-visible {{ outline: 3px solid {RED}; }}
- 
+
 /* Input */
 [data-testid="stChatInput"] {{
     border: 2px solid {GREEN};
@@ -104,7 +110,7 @@ header[data-testid="stHeader"] {{ background: transparent; }}
     box-shadow: 0 0 0 3px rgba(193,39,45,.25);
 }}
 [data-testid="stChatInput"] textarea {{ direction: rtl; font-family: 'Tajawal', sans-serif; }}
- 
+
 /* Sidebar */
 [data-testid="stSidebar"] {{ background: {GREEN}; direction: rtl; }}
 [data-testid="stSidebar"] * {{ color: #fff; }}
@@ -112,23 +118,23 @@ header[data-testid="stHeader"] {{ background: transparent; }}
     background: {RED}; color: #fff; border: 2px solid #fff;
 }}
 </style>
- 
+
 <div class="hero">
     <img src="{LOGO_URI}" alt="Morocco logo"/>
     <h1>شات بوت خديجة</h1>
     <p>مرحبا بيك! كنهضر غير بالدارجة المغربية، سولني اللي بغيتي.</p>
 </div>
 """, unsafe_allow_html=True)
- 
+
 # ---------- Data ----------
 try:
     with open("data.json", "r", encoding="utf-8") as f:
         data = json.load(f)
 except Exception:
     data = []
- 
+
 FALLBACK = "سمح ليا، ما فهمتش سؤالك مزيان. عاود صيغو بطريقة أخرى."
- 
+
 SUGGESTIONS = [
     "شنو هي عاصمة المغرب؟",
     "كيفاش نوجد الطاجين؟",
@@ -137,8 +143,8 @@ SUGGESTIONS = [
     "شنو معنى علم المغرب؟",
     "شنو هي العملة المغربية؟",
 ]
- 
- 
+
+
 def get_answer(question: str) -> str:
     q = question.lower().strip().rstrip("؟?!.")
     for item in data:
@@ -147,33 +153,33 @@ def get_answer(question: str) -> str:
             if p in q or q in p:
                 return random.choice(item.get("responses", [FALLBACK]))
     return FALLBACK
- 
- 
+
+
 # ---------- State ----------
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "pending" not in st.session_state:
     st.session_state.pending = None
- 
+
 with st.sidebar:
     st.markdown("### خديجة")
     st.caption("بوت كيجاوب بالدارجة المغربية")
     if st.button("مسح المحادثة", use_container_width=True):
         st.session_state.messages = []
         st.rerun()
- 
+
 AVATARS = {"user": "🧑", "assistant": "🫖"}
- 
+
 # ---------- Handle input (typed or clicked suggestion) ----------
 prompt = st.chat_input("كتب سؤالك هنا بالدارجة...")
 if st.session_state.pending:
     prompt = st.session_state.pending
     st.session_state.pending = None
- 
+
 if prompt:
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.session_state.messages.append({"role": "assistant", "content": get_answer(prompt)})
- 
+
 # ---------- Render ----------
 if not st.session_state.messages:
     st.markdown("**جرب واحد من هاد الأسئلة:**")
@@ -182,9 +188,7 @@ if not st.session_state.messages:
         if cols[i % 2].button(q, key=f"s{i}", use_container_width=True):
             st.session_state.pending = q
             st.rerun()
- 
+
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"], avatar=AVATARS[msg["role"]]):
         st.write(msg["content"])
- 
-
