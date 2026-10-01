@@ -3,17 +3,7 @@ import json
 
 st.set_page_config(page_title="Chatbot Darija", page_icon="🇲🇦", layout="centered")
 
-# --- الزواق ---
-st.markdown("""
-<style>
-   .stApp { background-color: #FFF8F0; }
-    h1 { color: #C1272D; text-align: center; font-family: 'Arial'; }
-   .stChatMessage { border-radius: 15px; padding: 10px; }
-</style>
-""", unsafe_allow_html=True)
-
 st.title("🇲🇦 شات بوت خديجة بالدارجة")
-st.markdown("<p style='text-align:center'>سولني أي حاجة بالدارجة و نجاوبك!</p>", unsafe_allow_html=True)
 
 # قراءة البيانات
 try:
